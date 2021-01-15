@@ -1,0 +1,33 @@
+{% extends "layout/basic.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Прилет</h2>          
+    <table class="table table-borderless">
+      <thead>
+        <tr>
+          <th>Рейс</th>
+          <th>Дата вылета</th>
+          <th>Регистрация</th>
+          <th>Стойки регистрации</th>
+          <th>Посадка</th>
+          <th>Выход</th>
+          <th>Статус</th>
+          <th>Самолет</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ flight_info.flight_number }}</td>
+          <td>{{ flight_info.flight_time|date:"d F H:i" }}</td>
+          <td>{{ flight_info.reg_start|date:"H:i" }} - {{ flight_info.reg_end|date:"H:i" }}</td>
+          <td>{{ flight_info.desk }}</td>
+          <td>{{ flight_info.boarding_start|date:"H:i" }} - {{ flight_info.boarding_end|date:"H:i" }}</td>
+          <td>{{ flight_info.gate }}</td>
+          <td>{{ flight_info.status }}</td>
+          <td>{{ flight_info.aircraft }}</td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+{% endblock %}

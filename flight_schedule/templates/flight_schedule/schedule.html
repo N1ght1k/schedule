@@ -1,0 +1,128 @@
+{% extends "layout/basic.html" %} 
+{% block content %}
+{% verbatim %}
+<div id="app">
+  <div class="container">
+  Вылет
+  <label class="switch">
+    <input type="checkbox" v-on:click="change_state" autocomplete="off">
+    <span class="slider round"></span>
+  </label>
+  Прилет
+</div>
+  <div class="container">
+    <div class="btn-group" role="group" aria-label="Дата">
+      <button type="button" class="btn btn-secondary" v-on:click="get_flights('yesterday')">
+        Вчера
+      </button>
+      <button type="button" class="btn btn-secondary" v-on:click="get_flights('today')">Сегодня</button>
+      <button type="button" class="btn btn-secondary" v-on:click="get_flights('tomorrow')">Завтра</button>
+    </div>
+  </div>
+  <div class="container">
+    <template v-if="state">
+    <h2>Вылет</h2>
+    <table class="table table-borderless">
+      <thead>
+        <tr>
+          <th>Время</th>
+          <th>Авиакомпания</th>
+          <th>Номер рейса</th>
+          <th>Прилетает в</th>
+          <th>Статус</th>
+          <th>Терминал</th>
+          <th>Выход</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="flight in info">
+          <td>{{ flight.flight_time }}</td>
+          <td>{{ flight.aircompany }}</td>
+          <td><a v-bind:href="flight.flight_id">{{ flight.flight_number }}</a></td>
+          <td>{{ flight.city }}</td>
+          <td>{{ flight.status }}</td>
+          <td>{{ flight.terminal }}</td>
+          <td>{{ flight.gate }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </template>
+  <template v-else>
+    <h2>Прилет</h2>
+    <table class="table table-borderless">
+      <thead>
+        <tr>
+          <th>Время</th>
+          <th>Авиакомпания</th>
+          <th>Номер рейса</th>
+          <th>Прилетает из</th>
+          <th>Статус</th>
+          <th>Терминал</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="flight in info">
+          <td>{{ flight.flight_time }}</td>
+          <td>{{ flight.aircompany }}</td>
+          <td><a v-bind:href="flight.flight_id">{{ flight.flight_number }}</a></td>
+          <td>{{ flight.city }}</td>
+          <td>{{ flight.status }}</td>
+          <td>{{ flight.terminal }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </template>
+  </div>
+</div>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+  new Vue({
+    el: "#app",
+    data() {
+      return {
+        info: [],
+        state: true,
+      };
+    },
+    mounted() {
+      this.get_flights();
+    },
+    methods: {
+      changeTime: function (data) {
+        for (var flight in data) {
+          nDate = new Date(data[flight].flight_time);
+          nDate = nDate.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          data[flight].flight_time = nDate;
+        }
+        this.info = data;
+      },
+      get_flights: function (day = "today") {
+        console.log(day);
+        if (this.state == true) {
+          axios
+          .get("http://localhost:8000/api/departure/" + day.toString())
+          .then((response) => this.changeTime(response.data))
+          .catch((error) => console.log(error));
+        } else {
+          axios
+          .get("http://localhost:8000/api/arrival/" + day.toString())
+          .then((response) => this.changeTime(response.data))
+          .catch((error) => console.log(error));
+        }
+
+        console.log(this.state);
+        
+      },
+      change_state: function () {
+        this.state = !this.state;
+        this.get_flights();
+      },
+    },
+  });
+</script>
+{% endverbatim %}
+{% endblock %}
